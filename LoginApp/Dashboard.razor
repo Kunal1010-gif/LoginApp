@@ -1,0 +1,408 @@
+﻿@page "/dashboard"
+@using System.Globalization
+
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #f5f6fa;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+    }
+
+    .dashboard-wrapper {
+        padding: 20px;
+    }
+
+    .top-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+    }
+
+        .top-header h2 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            color: #333;
+        }
+
+    /* Small Search Box */
+    .search-box input {
+        padding: 6px 10px;
+        width: 200px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        background: white;
+        font-size: 13px;
+        height: 32px;
+    }
+
+    /* Form Card */
+    .form-card {
+        background: white;
+        padding: 18px;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+        margin-bottom: 25px;
+    }
+
+        .form-card h3 {
+            margin: 0 0 12px;
+            font-size: 18px;
+            color: #333;
+        }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+    }
+
+        /* Compact Inputs */
+        .form-grid input,
+        .form-grid select {
+            width: 100%;
+            padding: 6px 8px;
+            font-size: 13px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #fafafa;
+            height: 32px; /* small height */
+        }
+
+    label {
+        font-weight: 600;
+        color: #444;
+        margin-bottom: 3px;
+        display: block;
+        font-size: 13px;
+    }
+
+    /* Buttons */
+    .button-row {
+        margin-top: 15px;
+        display: flex;
+        gap: 12px;
+    }
+
+    button {
+        border: none;
+        padding: 7px 16px;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 13px;
+        height: 34px; /* small height */
+    }
+
+    .btn-save {
+        background: #27ae60;
+        color: white;
+    }
+
+    .btn-cancel {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .btn-reset {
+        background: #7f8c8d;
+        color: white;
+    }
+
+    .btn-member {
+        background: #f1c40f;
+        color: black;
+    }
+
+    /* Table Card */
+    .table-card {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1100px;
+    }
+
+    thead {
+        background: #f0f0f5;
+    }
+
+    th, td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #ddd;
+        font-size: 13px;
+        color: #333;
+        text-align: center;
+    }
+
+    tbody tr:hover {
+        background: #f9f9ff;
+    }
+
+    .edit-btn {
+        background: none;
+        border: none;
+        color: #3498db;
+        font-weight: 500;
+        cursor: pointer;
+        font-size: 13px;
+    }
+</style>
+
+
+
+<div class="dashboard-wrapper">
+
+    <!-- Header -->
+    <div class="top-header">
+        <h2>Task Dashboard</h2>
+
+        <div class="search-box">
+            <input type="text" placeholder="Search..." @bind="searchTerm" />
+        </div>
+    </div>
+
+
+    <!-- FORM CARD -->
+    <div class="form-card">
+        <h3>Add / Edit Task</h3>
+
+        <div class="form-grid">
+
+            <div>
+                <label>Emp Name</label>
+                <input type="text" @bind="task.EmpName" />
+            </div>
+
+            <div>
+                <label>Job ID</label>
+                <input type="text" @bind="task.JobID" />
+            </div>
+
+            <div>
+                <label>Client Name</label>
+                <select @bind="task.ClientName">
+                    <option value="">Select</option>
+                    @foreach (var c in clientList)
+                    {
+                        <option>@c</option>
+                    }
+                </select>
+            </div>
+
+            <div>
+                <label>Estimate Time (HH:MM)</label>
+                <div style="display:flex; gap:5px;">
+                    <input type="number" min="0" max="23" style="width:60px" @bind="task.EstimateHour" /> :
+                    <input type="number" min="0" max="59" style="width:60px" @bind="task.EstimateMinute" />
+                </div>
+            </div>
+
+            <div>
+                <label>Start Time</label>
+                <input type="datetime-local" @bind="task.StartTimeLocal" />
+            </div>
+
+            <div>
+                <label>Deadline</label>
+                <input type="datetime-local" @bind="task.DeadlineLocal" />
+            </div>
+
+            <div>
+                <label>Consultant</label>
+                <select @bind="task.ConsultantName">
+                    <option value="">Select Consultant</option>
+                    @foreach (var con in consultantList)
+                    {
+                        <option>@con</option>
+                    }
+                </select>
+            </div>
+
+            <div>
+                <label>Time Zone</label>
+                <select @bind="task.TimeZone">
+                    <option value="">Select</option>
+                    @foreach (var tz in timeZones)
+                    {
+                        <option>@tz</option>
+                    }
+                </select>
+            </div>
+
+            <div>
+                <label>IST Time</label>
+                <input type="text" value="@formattedISTTime" disabled />
+            </div>
+
+            <div>
+                <label>Date</label>
+                <input type="date" @bind="task.Date" />
+            </div>
+
+        </div>
+
+        <div class="button-row">
+            <button class="btn-save" @onclick="SaveTask">Save</button>
+            <button class="btn-cancel" @onclick="CancelEdit">Cancel</button>
+            <button class="btn-reset" @onclick="ResetForm">Reset</button>
+            <button class="btn-member" @onclick="AddNewMember">+ Add Member</button>
+        </div>
+
+    </div>
+
+
+
+    <!-- TABLE CARD -->
+    <div class="table-card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Job Id</th>
+                    <th>Client</th>
+                    <th>Consultant</th>
+                    <th>Estimate</th>
+                    <th>Deadline</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>IST</th>
+                    <th>Date</th>
+                    <th>Emp Name</th>
+                    <th>Status</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var t in filteredTasks)
+                {
+                    <tr>
+                        <td>@t.JobID</td>
+                        <td>@t.ClientName</td>
+                        <td>@t.ConsultantName</td>
+                        <td>@GetEstimateTimeString(t)</td>
+                        <td>@FormatDateTime(t.DeadlineLocal)</td>
+                        <td>@FormatDateTime(t.StartTimeLocal)</td>
+                        <td>@FormatDateTime(t.EndTimeLocal)</td>
+                        <td>@GetISTTimeString(t.StartTimeLocal)</td>
+                        <td>@FormatDate(t.Date)</td>
+                        <td>@t.EmpName</td>
+                        <td>@t.Status</td>
+                        <td>
+                            <button class="edit-btn" @onclick="(() => EditTask(t))">Edit</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+@code {
+
+    // Dropdown lists
+    private List<string> clientList = new()
+    {
+        "Google", "Microsoft", "Amazon", "Meta", "Netflix", "Tesla"
+    };
+
+    private List<string> consultantList = new()
+    {
+        "John Smith", "Priya Sharma", "David Miller", "Emma Wilson"
+    };
+
+    private List<string> timeZones = new()
+    {
+        "IST (UTC+5:30)",
+        "EST (UTC-5)",
+        "PST (UTC-8)",
+        "GMT (UTC+0)",
+        "CET (UTC+1)"
+    };
+
+
+    private string searchTerm = "";
+    private TaskItem task = new();
+    private List<TaskItem> tasks = new();
+
+    private IEnumerable<TaskItem> filteredTasks =>
+        string.IsNullOrWhiteSpace(searchTerm)
+            ? tasks
+            : tasks.Where(t =>
+                (t.EmpName?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (t.JobID?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false)
+            );
+
+    private string formattedISTTime =>
+        task.StartTimeLocal == default ? "" : task.StartTimeLocal.AddHours(5.5).ToString("HH:mm");
+
+
+    // ----------------- MODEL ---------------------
+    public class TaskItem
+    {
+        public string EmpName { get; set; }
+        public string JobID { get; set; }
+        public string ClientName { get; set; }
+        public int EstimateHour { get; set; }
+        public int EstimateMinute { get; set; }
+        public DateTime StartTimeLocal { get; set; }
+        public DateTime DeadlineLocal { get; set; }
+        public string ConsultantName { get; set; }
+        public string TimeZone { get; set; }
+        public DateTime Date { get; set; } = DateTime.Now.Date;
+        public DateTime EndTimeLocal { get; set; }
+        public string Status { get; set; } = "Open";
+    }
+
+
+    // ----------------- FUNCTIONS ------------------
+
+    private void SaveTask()
+    {
+        task.EndTimeLocal = task.StartTimeLocal
+                             .AddHours(task.EstimateHour)
+                             .AddMinutes(task.EstimateMinute);
+
+        if (!tasks.Contains(task))
+            tasks.Add(task);
+
+        task = new TaskItem();
+    }
+
+    private void CancelEdit() => task = new TaskItem();
+    private void ResetForm() => task = new TaskItem();
+
+    private void AddNewMember()
+    {
+        Console.WriteLine("Add Member Clicked");
+    }
+
+    private void EditTask(TaskItem editTask)
+    {
+        task = editTask;
+    }
+
+    string GetEstimateTimeString(TaskItem t) =>
+        $"{t.EstimateHour:D2}:{t.EstimateMinute:D2}";
+
+    string FormatDateTime(DateTime dt) =>
+        dt == default ? "" : dt.ToString("g", CultureInfo.InvariantCulture);
+
+    string FormatDate(DateTime dt) =>
+        dt == default ? "" : dt.ToString("D", CultureInfo.InvariantCulture);
+
+    string GetISTTimeString(DateTime dt) =>
+        dt == default ? "" : dt.AddHours(5.5).ToString("HH:mm");
+}
+

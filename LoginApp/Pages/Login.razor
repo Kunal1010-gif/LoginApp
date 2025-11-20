@@ -1,0 +1,196 @@
+﻿@page "/login"
+@inject NavigationManager Navigation
+
+<style>
+    /* Container */
+    .login-container {
+        max-width: 90%;
+        width: 800px;
+        min-width: 300px;
+        height: auto;
+        background-image: url('/images/back-image.jpg');
+        background-repeat: no-repeat;
+        background-size: cover;
+        border-radius: 12px;
+        margin: 50px auto;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    /* Inner Gradient */
+    .login-inner {
+        background: linear-gradient(to right, #1e1e2f, #2a2a4d);
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        padding: 30px 20px;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+    /* Titles & Text */
+    .login-title {
+        font-family: 'Montserrat';
+        font-size: 18px;
+        color: darkgray;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .dashboard-text {
+        color: lightgray;
+        font-family: 'Montserrat';
+        font-size: 18px;
+        margin-top: 10px;
+    }
+
+    /* Inputs */
+    .text-input {
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid darkgray;
+        padding-left: 30px;
+        height: 35px;
+        background-color: transparent;
+        background-repeat: no-repeat;
+        background-position: left center;
+        background-size: 20px;
+        color: white;
+        font-family: 'Montserrat';
+        margin-bottom: 15px;
+    }
+
+    /* Buttons */
+    .login-btn {
+        background-color: #462AD8;
+        border: none;
+        border-radius: 20px;
+        color: white;
+        width: 150px;
+        height: 40px;
+        font-size: 12px;
+        font-family: 'Montserrat';
+        cursor: pointer;
+        margin-top: 15px;
+    }
+
+        .login-btn:hover {
+            background-color: #28AEED;
+        }
+
+    /* Error Text */
+    .error-text {
+        color: #D7596D;
+        font-size: 12px;
+        font-family: 'Montserrat';
+        margin-top: 10px;
+    }
+
+    /* Footer Buttons */
+    .footer-buttons {
+        margin-top: 15px;
+    }
+
+        .footer-buttons button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-family: 'Montserrat';
+            font-size: 12px;
+            color: darkgray;
+            margin-right: 10px;
+        }
+
+            .footer-buttons button:last-child {
+                color: white;
+            }
+
+    /* Responsive */
+     {
+        .login-inner
+
+    {
+        padding: 20px 15px;
+    }
+
+    .login-btn {
+        width: 100%;
+    }
+
+    .text-input {
+        height: 30px;
+    }
+
+    }
+</style>
+
+<div class="login-container">
+    <div class="login-inner">
+        <span class="login-title">LOG IN</span>
+
+        <img src="/sample-data/logo.png" width="195" height="20" style="margin-bottom: 10px;" />
+        <div class="dashboard-text">Slidexpress Dashboard</div>
+
+        <div style="margin-top: 30px; text-align: left; max-width: 250px; margin-left: auto; margin-right: auto;">
+            <label for="email" style="color: darkgray; font-family: Montserrat;">Email Id</label>
+            <input id="email" class="text-input" @bind="Username" @oninput="ClearError" placeholder="Enter your email"
+                   style="background-image: url('/images/user-icon.png');" />
+
+            <label for="password" style="color: darkgray; font-family: Montserrat; margin-top: 10px;">Password</label>
+            <input id="password" type="password" class="text-input" @bind="Password" @oninput="ClearError"
+                   placeholder="Enter your password" style="background-image: url('/images/password-icon.png');" />
+
+            @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+            {
+                <div class="error-text">@ErrorMessage</div>
+            }
+
+            <button class="login-btn" @onclick="Login1">LOG IN</button>
+
+            <div class="footer-buttons">
+                <button @onclick="ForgotPassword">Forgot Password?</button>
+                <button @onclick="Register">Register</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string Username { get; set; } = "";
+    private string Password { get; set; } = "";
+    private string ErrorMessage { get; set; } = "";
+
+    private async Task Login1()
+    {
+        if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
+        {
+            ErrorMessage = "Please enter both email and password.";
+            return;
+        }
+
+        // Demo authentication logic
+        if (Username == "admin" && Password == "1234")
+        {
+            ErrorMessage = "";
+            Navigation.NavigateTo("/dashboard");
+        }
+        else
+        {
+            ErrorMessage = "Invalid username or password.";
+        }
+    }
+
+    private void ForgotPassword()
+    {
+        Navigation.NavigateTo("/forgot-password");
+    }
+
+    private void Register()
+    {
+        Navigation.NavigateTo("/register");
+    }
+
+    private void ClearError()
+    {
+        ErrorMessage = "";
+    }
+}
